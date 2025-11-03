@@ -1,7 +1,6 @@
 import requests
 import json
 import time
-from pytrends.request import TrendReq
 
 creator_default = {
     "genre": "Technology",
