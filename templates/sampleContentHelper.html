@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Creator Helper ✨</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+      color: white;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-top: 40px;
+      font-size: 2.5rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .creator-info {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      width: 80%;
+      max-width: 700px;
+      margin: 20px auto;
+      backdrop-filter: blur(6px);
+    }
+
+    .creator-info h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .creator-info p {
+      margin: 4px 0;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #facc15;
+      color: #111;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #fde047;
+      transform: scale(1.05);
+    }
+
+    .result-container {
+      width: 90%;
+      max-width: 900px;
+      margin-top: 30px;
+    }
+
+    .trend {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 15px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .idea-card {
+      background: white;
+      color: #111;
+      border-radius: 14px;
+      padding: 15px 20px;
+      margin: 15px 0;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .idea-card:hover {
+      transform: scale(1.02);
+    }
+
+    .idea-title {
+      font-weight: 700;
+      color: #4f46e5;
+      font-size: 1.1rem;
+    }
+
+    .hook {
+      color: #9333ea;
+      font-style: italic;
+      margin: 6px 0;
+    }
+
+    .angle {
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #loading {
+      display: none;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎥 Content Creator Helper</h1>
+
+  <div class="creator-info">
+    <h2>👤 Creator Profile</h2>
+    <p><b>Genre:</b> Technology</p>
+    <p><b>Sub-Genre:</b> Software Development, AI tools, Interview Prep, Resources</p>
+    <p><b>Audience:</b> Young professionals, students</p>
+    <p><b>Location:</b> India</p>
+    <p><b>Language:</b> English</p>
+  </div>
+
+  <button id="generateBtn">✨ Generate Ideas</button>
+  <div id="loading">⚙️ Fetching trends & generating ideas...</div>
+
+  <div class="result-container" id="results"></div>
+
+  <div class="footer">Made for creative minds 💡 | Powered by Gemini 2.5 Pro</div>
+
+  <script>
+    const btn = document.getElementById("generateBtn");
+    const resultsDiv = document.getElementById("results");
+    const loading = document.getElementById("loading");
+
+    btn.addEventListener("click", async () => {
+      resultsDiv.innerHTML = "";
+      loading.style.display = "block";
+
+      try {
+        const res = await fetch("generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            creator: {
+              genre: "Technology",
+              sub_genre: "Software Development, AI tools, Interview Preparation, Resources",
+              audience: "Young professionals, students",
+              location: "India",
+              language: "English"
+            },
+            n: 5
+          }),
+        });
+
+        const data = await res.json();
+        loading.style.display = "none";
+
+        if (data.error) {
+          resultsDiv.innerHTML = `<p style="color:red;">❌ Error: ${data.error}</p>`;
+          return;
+        }
+
+        let html = "<h2>🔥 Trending Topics</h2>";
+        data.trends.forEach(t => {
+          html += `<div class='trend'>${t}</div>`;
+        });
+
+        if (data.results && data.results.content_suggestions) {
+          html += "<h2>💡 AI-Generated Ideas</h2>";
+          data.results.content_suggestions.forEach(idea => {
+            if (idea.is_relevant) {
+              html += `
+                <div class="idea-card">
+                  <div class="idea-title">${idea.blended_topic_idea}</div>
+                  <div class="hook">"${idea.short_video_hook}"</div>
+                  <div class="angle">${idea.content_angle}</div>
+                  <p><b>🎬 Format:</b> ${idea.suggested_format || "N/A"}</p>
+                  <p><b>Relevance:</b> ${idea.relevance_score}/100</p>
+                </div>`;
+            } else {
+              html += `
+                <div class="idea-card" style="opacity:0.7;">
+                  <div class="idea-title">❌ Not Relevant</div>
+                  <p><b>Trend:</b> ${idea.original_trend}</p>
+                  <p>${idea.reason}</p>
+                </div>`;
+            }
+          });
+        }
+
+        resultsDiv.innerHTML = html;
+
+      } catch (err) {
+        loading.style.display = "none";
+        resultsDiv.innerHTML = `<p style="color:red;">⚠️ Something went wrong: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
