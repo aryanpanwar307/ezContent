@@ -2,6 +2,8 @@ import requests
 import json
 import time
 import traceback
+import os
+import praw
 
 creator_default = {
     "genre": "Technology",
@@ -11,20 +13,24 @@ creator_default = {
     "language": "English"
 }
 
-def fetch_trends(n=10):
+def fetch_trends(n=20):
     try:
-        url = "https://www.reddit.com/r/popular.json?limit=20"
-        headers = {"User-Agent": "TrendFetcher/1.0"}
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        posts = data["data"]["children"]
-        return [post["data"]["title"] for post in posts[:n]], None
+        reddit = praw.Reddit(
+            client_id=os.getenv("REDDIT_CLIENT_ID"),
+            client_secret=os.getenv("REDDIT_SECRET"),
+            user_agent=os.getenv("REDDIT_USER_AGENT")
+        )
+
+        # Fetch top trending posts from r/popular
+        hot_posts = reddit.subreddit("popular").hot(limit=n)
+        trends = [post.title for post in hot_posts]
+        return trends, None
+
     except Exception as e:
-        error_msg = f"🔥 Error in fetch_trends: {type(e).__name__}: {e}"
-        print(error_msg)
+        import traceback
+        print("🔥 Error in fetch_trends:", e)
         traceback.print_exc()
-        return None, error_msg
+        return None, str(e)
 
 SYSTEM_PROMPT = """
 You are an expert social media content strategist and a creative idea generator for a tech creator.

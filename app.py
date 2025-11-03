@@ -19,7 +19,7 @@ def generate_content():
     try:
         data = request.get_json(force=True)
         creator_info = data.get("creator", creator_default)
-        n = data.get("n", 10)
+        n = data.get("n",20)
 
         trends, err = fetch_trends(n)
         if err:
