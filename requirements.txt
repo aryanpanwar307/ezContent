@@ -8,4 +8,4 @@ python-dotenv
 # Optional — only needed if you use Gemini or another LLM
 google-generativeai
 
-
+praw
