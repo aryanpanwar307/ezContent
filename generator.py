@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import traceback
 
 creator_default = {
     "genre": "Technology",
@@ -10,7 +11,7 @@ creator_default = {
     "language": "English"
 }
 
-def fetch_trends(n=5):
+def fetch_trends(n=10):
     try:
         url = "https://www.reddit.com/r/popular.json?limit=20"
         headers = {"User-Agent": "TrendFetcher/1.0"}
@@ -18,10 +19,12 @@ def fetch_trends(n=5):
         response.raise_for_status()
         data = response.json()
         posts = data["data"]["children"]
-        return [post["data"]["title"] for post in posts[:n]]
+        return [post["data"]["title"] for post in posts[:n]], None
     except Exception as e:
-        print(f"⚠️ Error fetching trends: {e}")
-        return []
+        error_msg = f"🔥 Error in fetch_trends: {type(e).__name__}: {e}"
+        print(error_msg)
+        traceback.print_exc()
+        return None, error_msg
 
 SYSTEM_PROMPT = """
 You are an expert social media content strategist and a creative idea generator for a tech creator.

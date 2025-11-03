@@ -19,11 +19,15 @@ def generate_content():
     try:
         data = request.get_json(force=True)
         creator_info = data.get("creator", creator_default)
-        n = data.get("n", 5)
+        n = data.get("n", 10)
 
-        trends = fetch_trends(n)
+        trends, err = fetch_trends(n)
+        if err:
+            print("❌ fetch_trends failed:", err)
+            return jsonify({"error": err}), 500
+
         if not trends:
-            return jsonify({"error": "No trends found"}), 500
+            return jsonify({"error": "No trends found"}), 404
 
         ideas = get_blended_ideas(creator_info, trends, API_KEY)
         return jsonify({
