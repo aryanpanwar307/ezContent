@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, render_template
-from generator import fetch_trends, get_blended_ideas, creator_default
+from generator import fetch_trends, get_blended_ideas
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -18,7 +18,7 @@ def home():
 def generate_content():
     try:
         data = request.get_json(force=True)
-        creator_info = data.get("creator", creator_default)
+        creator_info = data["creator"]
         n = data.get("n",20)
 
         trends, err = fetch_trends(n)

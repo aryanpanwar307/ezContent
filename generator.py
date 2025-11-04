@@ -5,13 +5,6 @@ import traceback
 import os
 import praw
 
-creator_default = {
-    "genre": "Technology",
-    "sub_genre": "Software Development, AI tools, Interview Preparation, Resource(Github repositories, Free tools, Websites, Youtube channels/Videos)",
-    "audience": "Young professionals, students",
-    "location": "India",
-    "language": "English"
-}
 
 def fetch_trends(n=20):
     try:
@@ -33,7 +26,7 @@ def fetch_trends(n=20):
         return None, str(e)
 
 SYSTEM_PROMPT = """
-You are an expert social media content strategist and a creative idea generator for a tech creator.
+You are an expert social media content strategist and a creative idea generator for a content creator.
 Your goal is to blend current, high-traffic national trends with the creator's specific niche to generate engaging, relevant, and original short video ideas.
 ...
 """

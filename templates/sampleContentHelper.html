@@ -24,6 +24,7 @@
       font-weight: 700;
     }
 
+    /* Updated to be a form */
     .creator-info {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 16px;
@@ -36,8 +37,34 @@
 
     .creator-info h2 {
       font-size: 1.5rem;
-      margin-bottom: 10px;
+      margin-bottom: 15px; /* Added more space */
     }
+    
+    /* --- NEW STYLES FOR FORM --- */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .creator-info label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .creator-info input[type="text"] {
+      width: 100%;
+      box-sizing: border-box; /* Ensures padding doesn't break width */
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.8);
+      color: #111;
+      font-family: "Poppins", sans-serif;
+      font-size: 0.95rem;
+    }
+    /* --- END NEW STYLES --- */
 
     .creator-info p {
       margin: 4px 0;
@@ -55,11 +82,12 @@
       cursor: pointer;
       margin-top: 15px;
       transition: all 0.2s ease;
+      width: 100%; /* Make button full-width inside form */
     }
 
     button:hover {
       background: #fde047;
-      transform: scale(1.05);
+      transform: scale(1.02); /* Adjusted hover for full-width */
     }
 
     .result-container {
@@ -130,16 +158,36 @@
 
   <h1>🎥 Content Creator Helper</h1>
 
-  <div class="creator-info">
+  <form class="creator-info" id="creator-form">
     <h2>👤 Creator Profile</h2>
-    <p><b>Genre:</b> Technology</p>
-    <p><b>Sub-Genre:</b> Software Development, AI tools, Interview Prep, Resources</p>
-    <p><b>Audience:</b> Young professionals, students</p>
-    <p><b>Location:</b> India</p>
-    <p><b>Language:</b> English</p>
-  </div>
+    
+    <div class="form-group">
+      <label for="genre">Genre:</label>
+      <input type="text" id="genre" name="genre" value="Technology" required />
+    </div>
+    
+    <div class="form-group">
+      <label for="sub_genre">Sub-Genre (comma-separated):</label>
+      <input type="text" id="sub_genre" name="sub_genre" value="Software Development, AI tools, Interview Prep, Resources" required />
+    </div>
 
-  <button id="generateBtn">✨ Generate Ideas</button>
+    <div class="form-group">
+      <label for="audience">Audience:</label>
+      <input type="text" id="audience" name="audience" value="Young professionals, students" required />
+    </div>
+
+    <div classs="form-group">
+      <label for="location">Location:</label>
+      <input type="text" id="location" name="location" value="India" required />
+    </div>
+
+    <div class="form-group">
+      <label for="language">Language:</label>
+      <input type="text" id="language" name="language" value="English" required />
+    </div>
+
+    <button id="generateBtn" type="submit">✨ Generate Ideas</button>
+  </form>
   <div id="loading">⚙️ Fetching trends & generating ideas...</div>
 
   <div class="result-container" id="results"></div>
@@ -147,13 +195,31 @@
   <div class="footer">Made for creative minds 💡 | Powered by Gemini 2.5 Pro</div>
 
   <script>
-    const btn = document.getElementById("generateBtn");
+    // Get form, results, and loading elements
+    const form = document.getElementById("creator-form");
     const resultsDiv = document.getElementById("results");
     const loading = document.getElementById("loading");
 
-    btn.addEventListener("click", async () => {
+    // Listen for the 'submit' event on the form
+    form.addEventListener("submit", async (event) => {
+      // Prevent the default form submission (page reload)
+      event.preventDefault(); 
+      
       resultsDiv.innerHTML = "";
       loading.style.display = "block";
+
+      // --- UPDATED SECTION: Get data from form ---
+      const payload = {
+        creator: {
+          genre: document.getElementById("genre").value,
+          sub_genre: document.getElementById("sub_genre").value,
+          audience: document.getElementById("audience").value,
+          location: document.getElementById("location").value,
+          language: document.getElementById("language").value
+        },
+        n: 20
+      };
+      // --- End of updated section ---
 
       try {
         const res = await fetch("generate", {
@@ -161,16 +227,8 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            creator: {
-              genre: "Technology",
-              sub_genre: "Software Development, AI tools, Interview Preparation, Resources",
-              audience: "Young professionals, students",
-              location: "India",
-              language: "English"
-            },
-            n: 20
-          }),
+          // Use the dynamic payload from the form
+          body: JSON.stringify(payload),
         });
 
         const data = await res.json();
