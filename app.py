@@ -7,8 +7,12 @@ import os
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
-# Optional: load Gemini API key from env
-API_KEY = os.getenv("API_KEY")
+# Load Gemini API key from env and clean it
+raw_key = os.getenv("API_KEY", "")
+API_KEY = raw_key.strip().replace('"', '').replace("'", "")
+
+if not API_KEY:
+    print("⚠️ WARNING: API_KEY not found in .env file!")
 
 @app.route("/")
 def home():
