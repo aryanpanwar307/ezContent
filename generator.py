@@ -10,7 +10,8 @@ def fetch_trends(n=20):
         reddit = praw.Reddit(
             client_id=os.getenv("REDDIT_CLIENT_ID"),
             client_secret=os.getenv("REDDIT_SECRET"),
-            user_agent=os.getenv("REDDIT_USER_AGENT")
+            user_agent=os.getenv("REDDIT_USER_AGENT"),
+            read_only=True
         )
         hot_posts = reddit.subreddit("popular").hot(limit=n)
         trends = [post.title for post in hot_posts]

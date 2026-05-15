@@ -42,6 +42,20 @@ def generate_content():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Global error handlers — always return JSON, never HTML
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "Endpoint not found"}), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({"error": "Internal server error. Check server logs."}), 500
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    print(f"🔥 Unhandled exception: {e}")
+    return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

@@ -645,11 +645,21 @@
       };
 
       try {
-        const res = await fetch("generate", {
+        const res = await fetch("/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+
+        // Guard: if response is not JSON (e.g. server returned an HTML error page)
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+          const text = await res.text();
+          loading.style.display = "none";
+          resultsDiv.innerHTML = `<div class="glass-panel" style="border-color:#ef4444;"><h3 style="color:#ef4444;margin-bottom:1rem;"><i class="fas fa-exclamation-circle"></i> Server Error (${res.status})</h3><p>The server returned an unexpected response. Check that all API keys are set as Secrets in your Hugging Face Space settings (API_KEY, REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_USER_AGENT).</p></div>`;
+          console.error("Non-JSON response:", text.substring(0, 500));
+          return;
+        }
 
         const data = await res.json();
         loading.style.display = "none";
